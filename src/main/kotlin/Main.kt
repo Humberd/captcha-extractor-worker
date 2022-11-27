@@ -1,16 +1,20 @@
 import db.DbConnector
 import db.models.CaptchaChallengeDb
+import mu.KotlinLogging
 import network.models.CaptchaChallenge
 import org.ktorm.dsl.from
 import org.ktorm.dsl.insert
 import org.ktorm.dsl.select
 import retrofit2.HttpException
 
+private val logger = KotlinLogging.logger {}
+
+
 suspend fun main(args: Array<String>) {
     downloadAndSaveChallenge()
 
     for (row in DbConnector.database.from(CaptchaChallengeDb).select()) {
-        println(row[CaptchaChallengeDb.id])
+        logger.info { row[CaptchaChallengeDb.id] }
     }
 }
 
@@ -19,7 +23,7 @@ suspend fun downloadAndSaveChallenge() {
         CaptchaChallenge.client.sessionGetChallenge()
     } catch (e: HttpException) {
         if (e.code() == 403) {
-            System.err.println("403: Invalid sessionGetChallenge payload. Update CAPTCHA_REQUEST_PAYLOAD and CAPTCHA_REQUEST_COOKIES_HEADER env variables")
+            logger.error(e) { "403: Invalid sessionGetChallenge payload. Update CAPTCHA_REQUEST_PAYLOAD and CAPTCHA_REQUEST_COOKIES_HEADER env variables" }
         }
         throw e
     }

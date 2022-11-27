@@ -37,5 +37,7 @@ kotlin {
         implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
         implementation("org.ktorm:ktorm-core:3.5.0")
         implementation("org.ktorm:ktorm-support-postgresql:3.5.0")
+        implementation("io.github.microutils:kotlin-logging-jvm:3.0.2")
+        implementation("org.slf4j:slf4j-simple:2.0.5")
     }
 }
