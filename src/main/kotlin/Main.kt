@@ -1,14 +1,33 @@
 import db.DbConnector
-import db.models.CaptchaChallenges
+import db.models.CaptchaChallengeDb
+import network.models.CaptchaChallenge
 import org.ktorm.dsl.from
+import org.ktorm.dsl.insert
 import org.ktorm.dsl.select
+import retrofit2.HttpException
 
 suspend fun main(args: Array<String>) {
-//    val sessionGetChallenge = CaptchaChallenge.client.sessionGetChallenge()
-//    println(sessionGetChallenge)
+    downloadAndSaveChallenge()
 
-    for (row in DbConnector.database.from(CaptchaChallenges).select()) {
-        println(row[CaptchaChallenges.id])
+    for (row in DbConnector.database.from(CaptchaChallengeDb).select()) {
+        println(row[CaptchaChallengeDb.id])
     }
 }
 
+suspend fun downloadAndSaveChallenge() {
+    val response = try {
+        CaptchaChallenge.client.sessionGetChallenge()
+    } catch (e: HttpException) {
+        if (e.code() == 403) {
+            System.err.println("403: Invalid sessionGetChallenge payload. Update CAPTCHA_REQUEST_PAYLOAD and CAPTCHA_REQUEST_COOKIES_HEADER env variables")
+        }
+        throw e
+    }
+
+    DbConnector.database.insert(CaptchaChallengeDb) {
+        set(it.id, response.challengeId)
+        set(it.imageId, response.imageId)
+        set(it.badgeCount, response.badgeCount)
+        set(it.imageBase64Src, response.imageBase64Src)
+    }
+}

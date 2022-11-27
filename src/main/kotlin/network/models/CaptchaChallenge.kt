@@ -17,7 +17,7 @@ object CaptchaChallenge {
 
     init {
         val interceptor = HttpLoggingInterceptor({ println(it) })
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        interceptor.setLevel(HttpLoggingInterceptor.Level.NONE)
         val httpClient: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(interceptor)
             .build()
@@ -46,6 +46,6 @@ object CaptchaChallenge {
         @JsonProperty("imageId") val imageId: String,
         @JsonProperty("challengeId") val challengeId: String,
         @JsonProperty("minCnt") val badgeCount: Int,
-        @JsonProperty("onLoad") val onLoad: String
+        @JsonProperty("onLoad") val onLoad: String?
     )
 }
