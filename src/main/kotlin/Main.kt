@@ -2,19 +2,22 @@ import db.DbConnector
 import db.models.CaptchaChallengeDb
 import mu.KotlinLogging
 import network.models.CaptchaChallenge
-import org.ktorm.dsl.from
 import org.ktorm.dsl.insert
-import org.ktorm.dsl.select
 import retrofit2.HttpException
 
 private val logger = KotlinLogging.logger {}
 
 
-suspend fun main(args: Array<String>) {
-    downloadAndSaveChallenge()
+suspend fun main() {
+    downloadAndSaveChallengeTask()
+}
 
-    for (row in DbConnector.database.from(CaptchaChallengeDb).select()) {
-        logger.info { row[CaptchaChallengeDb.id] }
+suspend fun downloadAndSaveChallengeTask() {
+    var counter = 0;
+    while (true) {
+        downloadAndSaveChallenge()
+        counter++
+        logger.info { "Download and save captcha challenge completed. Total added: $counter" }
     }
 }
 
