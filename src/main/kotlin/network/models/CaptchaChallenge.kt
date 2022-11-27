@@ -2,7 +2,6 @@ package network.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import env.Environment
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -11,7 +10,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.*
-
 
 object CaptchaChallenge {
     private const val BASE_URL = "https://www.erepublik.com"
