@@ -1,10 +1,11 @@
 import db.DbConnector
 import db.models.CaptchaChallengeDb
 import mu.KotlinLogging
+import org.bytedeco.javacpp.Loader
+import org.bytedeco.opencv.opencv_java
 import org.ktorm.dsl.from
 import org.ktorm.dsl.limit
 import org.ktorm.dsl.select
-import org.opencv.core.Core
 import org.opencv.core.MatOfByte
 import org.opencv.imgcodecs.Imgcodecs
 import java.util.*
@@ -13,7 +14,8 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 fun main() {
-    System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    // https://github.com/bytedeco/javacpp-presets/tree/master/opencv#documentation
+    Loader.load(opencv_java::class.java)
 
     for (queryRowSet in DbConnector.database.from(CaptchaChallengeDb).select().limit(1)) {
         val imgBase64 = queryRowSet[CaptchaChallengeDb.imageBase64Src]!!
