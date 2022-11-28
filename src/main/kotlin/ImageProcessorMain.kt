@@ -1,6 +1,7 @@
 import db.DbConnector
 import db.models.CaptchaChallengeDb
 import image.base64ToMat
+import image.splitLegendBar
 import kotlinx.coroutines.delay
 import mu.KotlinLogging
 import org.bytedeco.javacpp.Loader
@@ -20,6 +21,7 @@ suspend fun main() {
     val converter = ToMat()
 
     for (queryRowSet in DbConnector.database.from(CaptchaChallengeDb).select().limit(1)) {
+        tasks(queryRowSet[CaptchaChallengeDb.imageBase64Src]!!, frame, converter)
 //        frame.showImage(converter.convert(image))
 
 //        val grayImage = decodedImage.clone()
@@ -29,9 +31,6 @@ suspend fun main() {
 //        val threshold = 20.0
 //        Imgproc.Canny(detectedImage, detectedImage, threshold, threshold * 3, 3, false)
 //        frame.showImage(converter.convert(detectedImage))
-        val decodedImage = base64ToMat(queryRowSet[CaptchaChallengeDb.imageBase64Src]!!)
-
-
     }
 
     while (frame.isVisible) {
@@ -41,3 +40,8 @@ suspend fun main() {
     frame.dispose()
 }
 
+suspend fun tasks(base64ImgSrc: String, canvas: CanvasFrame, converter: ToMat) {
+    val decodedRawImage = base64ToMat(base64ImgSrc)
+    val (pictureImage, legendBarImage) = splitLegendBar(decodedRawImage)
+    canvas.showImage(converter.convert(pictureImage))
+}
