@@ -2,18 +2,16 @@ import db.DbConnector
 import db.models.CaptchaChallengeDb
 import image.SplitImage
 import image.base64ToMat
+import image.meanSquaredError
 import image.splitLegendBar
 import mu.KotlinLogging
 import org.bytedeco.javacpp.Loader
 import org.bytedeco.javacv.CanvasFrame
 import org.bytedeco.javacv.OpenCVFrameConverter.ToMat
-import org.bytedeco.opencv.global.opencv_imgproc
 import org.bytedeco.opencv.opencv_java
-import org.bytedeco.opencv.opencv_quality.QualityMSE
 import org.ktorm.dsl.from
 import org.ktorm.dsl.limit
 import org.ktorm.dsl.select
-import types.MatJavaCV
 import java.awt.event.KeyEvent
 
 private val logger = KotlinLogging.logger {}
@@ -24,12 +22,7 @@ suspend fun main() {
     val frame = CanvasFrame("Hello")
     val converter = ToMat()
 
-    val images = mutableListOf<SplitImage>()
-
-    for (queryRowSet in DbConnector.database.from(CaptchaChallengeDb).select().limit(300)) {
-        val image = initialImagePrepare(queryRowSet[CaptchaChallengeDb.imageBase64Src]!!)
-        images.add(image)
-    }
+    val images = getAndConvertImagesFromDb(30)
 
 //    findClusters(images)
     val foo = meanSquaredError(images[16].pictureImage, images[299].pictureImage)
@@ -57,25 +50,18 @@ suspend fun main() {
     frame.dispose()
 }
 
+fun getAndConvertImagesFromDb(limit: Int = -1): MutableList<SplitImage> {
+    val images = mutableListOf<SplitImage>()
+
+    for (queryRowSet in DbConnector.database.from(CaptchaChallengeDb).select().limit(limit)) {
+        val image = initialImagePrepare(queryRowSet[CaptchaChallengeDb.imageBase64Src]!!)
+        images.add(image)
+    }
+
+    return images
+}
+
 fun initialImagePrepare(base64ImgSrc: String): SplitImage {
     val decodedRawImage = base64ToMat(base64ImgSrc)
-    return splitLegendBar(decodedRawImage)
-}
-
-fun findClusters(images: List<SplitImage>) {
-    logger.info { images.size }
-}
-
-
-fun meanSquaredError(img1: MatJavaCV, img2: MatJavaCV): MatJavaCV {
-    val img1Gray = MatJavaCV()
-    opencv_imgproc.cvtColor(img1, img1Gray, opencv_imgproc.COLOR_RGB2GRAY)
-
-    val img2Gray = MatJavaCV()
-    opencv_imgproc.cvtColor(img2, img2Gray, opencv_imgproc.COLOR_RGB2GRAY)
-
-    val diff = MatJavaCV(img1.size())
-    val scalar = QualityMSE.compute(img1Gray, img2Gray, diff)
-    logger.info {scalar}
-    return img1Gray
+    return splitLegendBar(decodedRawImage, base64ImgSrc)
 }

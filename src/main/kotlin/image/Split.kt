@@ -6,11 +6,11 @@ import types.MatJavaCV
 import types.height
 import types.width
 
-private const val IMG_HEIGHT = 230
-private const val IMG_WIDTH = 400
-private const val LEGEND_BAR_HEIGHT = 30
+const val IMG_HEIGHT = 230
+const val IMG_WIDTH = 400
+const val LEGEND_BAR_HEIGHT = 30
 
-fun splitLegendBar(src: MatJavaCV): SplitImage {
+fun splitLegendBar(src: MatJavaCV, base64ImgSrc: String): SplitImage {
     require(src.height() == IMG_HEIGHT, {
         "Image should have ${IMG_HEIGHT}px height, but has ${src.height()}"
     })
@@ -28,12 +28,14 @@ fun splitLegendBar(src: MatJavaCV): SplitImage {
     return SplitImage(
         pictureImage = MatJavaCV(src, pictureRect),
         legendBarImage = MatJavaCV(src, legendBarRect),
-        originalRawImage = src
+        originalRawImage = src,
+        base64ImgSrc = base64ImgSrc
     )
 }
 
 data class SplitImage(
     val pictureImage: MatJavaCV,
     val legendBarImage: MatJavaCV,
-    val originalRawImage: MatJavaCV
+    val originalRawImage: MatJavaCV,
+    val base64ImgSrc: String
 )
