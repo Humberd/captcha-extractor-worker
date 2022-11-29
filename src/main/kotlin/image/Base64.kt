@@ -1,9 +1,9 @@
 package image
 
 import mu.KotlinLogging
-import org.opencv.core.Mat
-import org.opencv.core.MatOfByte
+import org.bytedeco.opencv.global.opencv_imgcodecs.imdecode
 import org.opencv.imgcodecs.Imgcodecs
+import types.MatJavaCV
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -11,9 +11,9 @@ import javax.imageio.ImageIO
 
 private val logger = KotlinLogging.logger {}
 
-fun base64ToMat(data: String): Mat {
+fun base64ToMat(data: String): MatJavaCV {
     val imgBytes = base64ToBytes(data)
-    return Imgcodecs.imdecode(MatOfByte(*imgBytes), Imgcodecs.IMREAD_COLOR)
+    return imdecode(MatJavaCV(*imgBytes), Imgcodecs.IMREAD_COLOR)
 }
 
 fun base64ToBytes(data: String): ByteArray {

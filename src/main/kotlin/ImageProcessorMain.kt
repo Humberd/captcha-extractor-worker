@@ -9,9 +9,11 @@ import org.bytedeco.javacpp.Loader
 import org.bytedeco.javacv.CanvasFrame
 import org.bytedeco.javacv.OpenCVFrameConverter.ToMat
 import org.bytedeco.opencv.opencv_java
+import org.bytedeco.opencv.opencv_quality.QualityMSE
 import org.ktorm.dsl.from
 import org.ktorm.dsl.limit
 import org.ktorm.dsl.select
+import types.MatJavaCV
 
 private val logger = KotlinLogging.logger {}
 
@@ -23,10 +25,13 @@ suspend fun main() {
 
     val images = mutableListOf<SplitImage>()
 
-    for (queryRowSet in DbConnector.database.from(CaptchaChallengeDb).select().limit(30)) {
+    for (queryRowSet in DbConnector.database.from(CaptchaChallengeDb).select().limit(5)) {
         val image = initialImagePrepare(queryRowSet[CaptchaChallengeDb.imageBase64Src]!!)
         images.add(image)
     }
+
+//    findClusters(images)
+//    val foo = meanSquaredError(images[1].pictureImage, images[0].pictureImage)
 
     var displayedIndex = 0
     while (frame.isVisible) {
@@ -34,6 +39,7 @@ suspend fun main() {
             displayedIndex = 0
         }
         val imageToDisplay = images[displayedIndex]
+//        frame.showImage(converter.convert(foo))
         frame.showImage(converter.convert(imageToDisplay.originalRawImage))
         delay(500)
         displayedIndex++
@@ -47,3 +53,13 @@ fun initialImagePrepare(base64ImgSrc: String): SplitImage {
     return splitLegendBar(decodedRawImage)
 }
 
+fun findClusters(images: List<SplitImage>) {
+    logger.info { images.size }
+}
+
+
+fun meanSquaredError(img1: MatJavaCV, img2: MatJavaCV): MatJavaCV {
+    val diff = MatJavaCV()
+    QualityMSE.compute(img1, img2, diff)
+    return diff
+}
