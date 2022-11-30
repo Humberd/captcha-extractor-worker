@@ -3,11 +3,13 @@ package ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import image.SplitImage
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
+@ExperimentalComposeUiApi
 @Composable
 fun MainWindow(images: List<SplitImage>) {
     var image1Index by remember { mutableStateOf(0) }

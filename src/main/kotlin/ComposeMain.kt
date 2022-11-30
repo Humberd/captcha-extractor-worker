@@ -1,5 +1,6 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -12,12 +13,13 @@ import ui.MainWindow
 
 private val logger = KotlinLogging.logger {}
 
+@ExperimentalComposeUiApi
 fun main() = application {
     val coroutineScope = rememberCoroutineScope()
     var images by remember { mutableStateOf(listOf<SplitImage>()) }
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
-            images = getAndConvertImagesFromDb(10)
+            images = getAndConvertImagesFromDb(100)
         }
     }
 
